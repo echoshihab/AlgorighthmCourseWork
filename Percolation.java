@@ -6,8 +6,8 @@ public class Percolation {
 
     private WeightedQuickUnionUF quf;
     private int[] parallelStrucure;
-    private int virtualTopSite;
-    private int virtualBottomSite;
+    private int virtualTopSiteIndex;
+    private int virtualBottomSiteIndex;
     private int openSites;
     private int size;
     private int qufSize;
@@ -20,14 +20,15 @@ public class Percolation {
         size = n;
         //add 2 for two additional virtual site
         qufSize = (n * n) + 2;
-        virtualTopSite = qufSize - 1;
-        virtualBottomSite = qufSize;
+        virtualTopSiteIndex = qufSize - 1 - 1;
+        virtualBottomSiteIndex = qufSize - 1;
 
         //this parallel structure will be our representation of the grid
         parallelStrucure = new int[n * n];
+        int parrallelStructureLength = n * n;
 
         // lets set all slots to -1 to mark them as closed
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < parrallelStructureLength; i++) {
             parallelStrucure[i] = -1;
         }
         quf = new WeightedQuickUnionUF(qufSize);
@@ -36,29 +37,35 @@ public class Percolation {
 
     public void open(int row, int col) {
 
-        int site = row * col;
+        int site = (size * (row - 1)) + col;
+        System.out.println("Site: " + site);
         int siteIndexValue = site - 1;
+        System.out.println("SiteIndexValue: " + siteIndexValue);
         //only open site if the site is closed
         if (parallelStrucure[siteIndexValue] == -1) {
             //open site
             parallelStrucure[siteIndexValue] = siteIndexValue;
             openSites += 1;
+            System.out.println("opening site");
             //if this is on top row connect them to virtual site
             if (site <= size) {
-                quf.union(virtualTopSite, siteIndexValue);
+                quf.union(virtualTopSiteIndex, siteIndexValue);
+                System.out.println("connecting to virtual top site");
             }
             //if this is bottom row, connect it to virtual bottom site
             if (site > (size * size) - size) {
-                quf.union(virtualBottomSite, siteIndexValue);
+                quf.union(virtualBottomSiteIndex, siteIndexValue);
+                System.out.println("connecting to virtual bottom site");
             }
 
         }
 
         //lets check if adjacent sites exist
-        boolean rightSideExists = (site + 1) % size != 0;
-        boolean leftSideExists = (site - 1) % size != 0;
-        boolean topSideExists = (site - size) % size > 0;
-        boolean bottomSideExists = (site + size) % size > 0 && (site + size) / size <= size;
+        boolean rightSideExists = site % size != 0;
+        boolean leftSideExists = site % size != 1;
+        boolean topSideExists = site > size;
+        System.out.println(topSideExists);
+        boolean bottomSideExists = site <= (size * size - size);
 
         //connect if right side is open
         if (rightSideExists && parallelStrucure[siteIndexValue + 1] != -1) {
@@ -69,12 +76,14 @@ public class Percolation {
             quf.union(siteIndexValue, siteIndexValue - 1);
         }
         //connect if top side is open
-        if (topSideExists && parallelStrucure[siteIndexValue + size] != -1) {
+        if (topSideExists && parallelStrucure[siteIndexValue - size] != -1) {
             quf.union(siteIndexValue, siteIndexValue + size);
+            System.out.println("this should get hit");
         }
         //connect if bottom side is open
         if (bottomSideExists && parallelStrucure[siteIndexValue + size] != -1) {
             quf.union(siteIndexValue, siteIndexValue + size);
+
 
         }
 
@@ -99,7 +108,7 @@ public class Percolation {
         // connected to an open site in the top
         // row via a chain of neighboring (left, right, up, down)
         // open sites.
-        if (quf.find(siteIndexValue) == quf.find(qufSize))
+        if (quf.find(siteIndexValue) == quf.find(qufSize - 1))
             return true;
         return false;
     }
@@ -111,7 +120,9 @@ public class Percolation {
 
     // does the system percolate?
     public boolean percolates() {
-        return quf.find(virtualTopSite) == quf.find(virtualBottomSite);
+        System.out.println(quf.find(virtualTopSiteIndex));
+        System.out.println(quf.find(virtualBottomSiteIndex));
+        return quf.find(virtualTopSiteIndex) == quf.find(virtualBottomSiteIndex);
     }
 
     // test client (optional)
@@ -119,8 +130,10 @@ public class Percolation {
         Percolation test = new Percolation(3);
 
         test.open(1,1);
-        test.open(1,2);
-        test.open(1, 3);
+        System.out.println("sequence 1");
+        test.open(2,1);
+        System.out.println("sequence 2");
+        test.open(3, 1);
 
         System.out.println(test.percolates());
     }
