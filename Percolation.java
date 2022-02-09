@@ -64,7 +64,6 @@ public class Percolation {
         boolean rightSideExists = site % size != 0;
         boolean leftSideExists = site % size != 1;
         boolean topSideExists = site > size;
-        System.out.println(topSideExists);
         boolean bottomSideExists = site <= (size * size - size);
 
         //connect if right side is open
@@ -77,8 +76,7 @@ public class Percolation {
         }
         //connect if top side is open
         if (topSideExists && parallelStrucure[siteIndexValue - size] != -1) {
-            quf.union(siteIndexValue, siteIndexValue + size);
-            System.out.println("this should get hit");
+            quf.union(siteIndexValue, siteIndexValue - size);
         }
         //connect if bottom side is open
         if (bottomSideExists && parallelStrucure[siteIndexValue + size] != -1) {
@@ -92,7 +90,9 @@ public class Percolation {
 
     // is the site (row, col) open?
     public boolean isOpen(int row, int col) {
-        if (parallelStrucure[(row * col) - 1] != -1) {
+        int site = (size * (row - 1)) + col;
+        int siteIndexValue = site - 1;
+        if (parallelStrucure[siteIndexValue] != -1) {
             return true;
         }
         return false;
@@ -101,14 +101,14 @@ public class Percolation {
 
     // is the site (row, col) full?
     public boolean isFull(int row, int col) {
-        int site = row * col;
+        int site = (size * (row - 1)) + col;
         int siteIndexValue = site - 1;
 
         //A full site is an open site that can be
         // connected to an open site in the top
         // row via a chain of neighboring (left, right, up, down)
         // open sites.
-        if (quf.find(siteIndexValue) == quf.find(qufSize - 1))
+        if (quf.find(siteIndexValue) == quf.find(virtualTopSiteIndex))
             return true;
         return false;
     }
@@ -127,15 +127,7 @@ public class Percolation {
 
     // test client (optional)
     public static void main(String[] args) {
-        Percolation test = new Percolation(3);
-
-        test.open(1,1);
-        System.out.println("sequence 1");
-        test.open(2,1);
-        System.out.println("sequence 2");
-        test.open(3, 1);
-
-        System.out.println(test.percolates());
+        PercolationVisualizer.main(args);
     }
 
 }
