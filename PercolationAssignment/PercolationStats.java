@@ -1,10 +1,15 @@
 package com.company;
 import edu.princeton.cs.algs4.StdRandom;
+import edu.princeton.cs.algs4.StdStats;
 
 public class PercolationStats {
     private int nval;
     private int trialsVal;
     private int[] openSitesAtPerc;
+    private double meanValue;
+    private double standardDevValue;
+    private double lowConfidence;
+    private double highConfidence;
     // perform independent trials on an n-by-n grid
     public PercolationStats(int n, int trials)
     {
@@ -42,22 +47,27 @@ public class PercolationStats {
     // sample mean of percolation threshold
     public double mean()
     {
-        throw new IllegalArgumentException();
+        meanValue = StdStats.mean(openSitesAtPerc);
+        return meanValue;
+
     }
     // sample standard deviation of percolation threshold
     public double stddev()
     {
-        throw new IllegalArgumentException();
+        standardDevValue = StdStats.stddev(openSitesAtPerc);
+        return standardDevValue;
     }
     // low endpoint of 95% confidence interval
     public double confidenceLo()
     {
-        throw new IllegalArgumentException();
+        lowConfidence = meanValue - ((1.96 * standardDevValue)/ Math.sqrt(trialsVal));
+        return lowConfidence;
     }
     // high endpoint of 95% confidence interval
     public double confidenceHi()
     {
-        throw new IllegalArgumentException();
+        highConfidence = meanValue - ((1.96 * standardDevValue)/ Math.sqrt(trialsVal));
+        return highConfidence;
     }
     // test client (see below)
     public static void main(String[] args)
@@ -65,6 +75,9 @@ public class PercolationStats {
         int n = Integer.valueOf(args[0]);
         int trials = Integer.valueOf(args[1]);
 
-
+        PercolationStats percStat = new PercolationStats(n, trials);
+        System.out.println("mean = "+ percStat.mean());
+        System.out.println("stddev = "+ percStat.stddev());
+        System.out.println("95% Confidence interval = ["+ percStat.confidenceHi() + "," + percStat.confidenceLo() + "]");
     }
 }
