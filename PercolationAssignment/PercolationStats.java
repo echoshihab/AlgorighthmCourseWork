@@ -25,7 +25,7 @@ public class PercolationStats {
       Percolation perc = new Percolation(n);
       while (true) {
         // randomly open site
-        int randomSite = StdRandom.uniform(n * n);
+        int randomSite = StdRandom.uniform(1, (n * n) + 1);
         int reminder = randomSite % nval;
         int divResult = randomSite / nval;
         int col, row;
