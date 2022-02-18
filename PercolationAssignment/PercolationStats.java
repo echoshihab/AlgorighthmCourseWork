@@ -7,10 +7,6 @@ public class PercolationStats {
   private int nval;
   private int trialsVal;
   private double[] percolationThreshold;
-  private double meanValue;
-  private double standardDevValue;
-  private double lowConfidence;
-  private double highConfidence;
   // perform independent trials on an n-by-n grid
   public PercolationStats(int n, int trials) {
     if (n <= 0 || trials <= 0) {
@@ -26,12 +22,12 @@ public class PercolationStats {
       while (true) {
         // randomly open site
         int randomSite = StdRandom.uniform(1, (n * n) + 1);
-        int reminder = randomSite % nval;
+        int remainder = randomSite % nval;
         int divResult = randomSite / nval;
         int col, row;
-        if (reminder != 0) {
+        if (remainder != 0) {
           row = divResult + 1;
-          col = reminder;
+          col = remainder;
         } else {
           row = divResult;
           col = nval;
@@ -47,23 +43,20 @@ public class PercolationStats {
 
   // sample mean of percolation threshold
   public double mean() {
-    meanValue = StdStats.mean(percolationThreshold);
-    return meanValue;
+    return StdStats.mean(percolationThreshold);
   }
   // sample standard deviation of percolation threshold
   public double stddev() {
-    standardDevValue = StdStats.stddev(percolationThreshold);
-    return standardDevValue;
+    return StdStats.stddev(percolationThreshold);
   }
   // low endpoint of 95% confidence interval
   public double confidenceLo() {
-    lowConfidence = meanValue - ((1.96 * standardDevValue) / Math.sqrt(trialsVal));
-    return lowConfidence;
+    return mean() - ((1.96 * stddev()) / Math.sqrt(trialsVal));
+
   }
   // high endpoint of 95% confidence interval
   public double confidenceHi() {
-    highConfidence = meanValue + ((1.96 * standardDevValue) / Math.sqrt(trialsVal));
-    return highConfidence;
+    return mean() + ((1.96 * stddev()) / Math.sqrt(trialsVal));
   }
   // test client (see below)
   public static void main(String[] args) {
